@@ -60,6 +60,11 @@ public class Controller {
     System.out.println("e= " + publicKey.getValue());
     System.out.println("d= " + privateKey.getValue());
 
+    BigInteger c = BigInteger.valueOf(5);
+    BigInteger c1;
+    BigInteger c2;
+    c1 = c.modPow(e,n);
+    c2 = c1.modPow(d,n);
     //Шифрование
     List<BigInteger> code = new List<BigInteger>() {
       @Override
