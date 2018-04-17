@@ -1,7 +1,7 @@
 package conrollers;
-import java.awt.TextArea;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
@@ -10,178 +10,75 @@ import java.util.ListIterator;
 import java.util.Random;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.TextArea;
 import javafx.util.Pair;
 
 
 
 public class Controller {
-  SecureRandom rand = new SecureRandom((new Date()).toString().getBytes());
-  String word = "word";
-  //Генерация p и q
-  BigInteger p = BigInteger.probablePrime(1024, rand);
-  BigInteger q = BigInteger.probablePrime(1024, rand);
-  //Вычисляем модуль n
-  BigInteger n = p.multiply(q);
-  //Вычисляем значение функции Эйлера
-  BigInteger f = (p.subtract(new BigInteger("1"))).multiply(q.subtract(new BigInteger("1")));
-  //Выбираем открытую экспоненту e
-  BigInteger e = new BigInteger("65537");
-  //Вычичсляем закрытую экспоненту d
-  BigInteger d = e.gcd(f);
-  //Открытый ключ
-  Pair publicKey = new Pair(n,e);
-  //Закрытый ключ
-  Pair privateKey = new Pair(n,d);
 
   @FXML
-  TextArea InputTextArea;
+  private TextArea input;
   @FXML
-  TextArea OutputTextArea;
+  private TextArea output;
 
   public void crypt(ActionEvent actionEvent) {
-    SecureRandom rand = new SecureRandom((new Date()).toString().getBytes());
+    SecureRandom rand = new SecureRandom();
     String word = "word";
     //Генерация p и q
-    BigInteger p = BigInteger.probablePrime(1024, rand);
-    BigInteger q = BigInteger.probablePrime(1024, rand);
+    BigInteger p = BigInteger.probablePrime(2048, rand);
+    BigInteger q = BigInteger.probablePrime(2048, rand);
     //Вычисляем модуль n
     BigInteger n = p.multiply(q);
     //Вычисляем значение функции Эйлера
-    BigInteger f = (p.subtract(new BigInteger("1"))).multiply(q.subtract(new BigInteger("1")));
+    BigInteger f = (p.subtract(BigInteger.ONE)).multiply(q.subtract(BigInteger.ONE));
     //Выбираем открытую экспоненту e
     BigInteger e = new BigInteger("65537");
     //Вычичсляем закрытую экспоненту d
-    BigInteger d = e.modInverse(n);
-    //Открытый ключ
-    Pair publicKey = new Pair(n,e);
-    //Закрытый ключ
-    Pair privateKey = new Pair(n,d);
-    System.out.println("n= " + publicKey.getKey());
-    System.out.println("e= " + publicKey.getValue());
-    System.out.println("d= " + privateKey.getValue());
+    BigInteger d = e.modInverse(f);
 
-    BigInteger c = BigInteger.valueOf(5);
-    BigInteger c1;
-    BigInteger c2;
-    c1 = c.modPow(e,n);
-    c2 = c1.modPow(d,n);
+    //Отладочная информация
+    System.out.println("p = " + p);
+    System.out.println("q = " + q);
+    System.out.println("n = " + n);
+    System.out.println("f = " + f);
+    System.out.println("e = " + e);
+    System.out.println("d = " + d);
+
     //Шифрование
-    List<BigInteger> code = new List<BigInteger>() {
-      @Override
-      public int size() {
-        return 0;
-      }
+    ArrayList<BigInteger> code = new ArrayList<BigInteger>();
 
-      @Override
-      public boolean isEmpty() {
-        return false;
-      }
+    //Переменная для текста
+    String text;
+    text = input.getText();
 
-      @Override
-      public boolean contains(Object o) {
-        return false;
-      }
+    for (int i = 0; i<text.length(); i++){
+      BigInteger tmp = new BigInteger(String.valueOf((int)text.charAt(i)));
+      code.add(tmp);
+    }
 
-      @Override
-      public Iterator<BigInteger> iterator() {
-        return null;
-      }
+    System.out.println("коды букв");
+    for (int i = 0; i<code.size(); i++){
+      System.out.println(code.get(i));
+    }
 
-      @Override
-      public Object[] toArray() {
-        return new Object[0];
-      }
+    System.out.println("Зашифрованные коды буквы");
+    for (int i = 0; i<code.size();i++){
+      code.set(i,code.get(i).modPow(e,n));
+      System.out.println(code.get(i));
+    }
 
-      @Override
-      public <T> T[] toArray(T[] a) {
-        return null;
-      }
+    //Дешифровка
+    String decode = "";
 
-      @Override
-      public boolean add(BigInteger bigInteger) {
-        return false;
-      }
+    System.out.println("дешифрованные коды букв");
+    for (int i = 0; i<code.size();i++){
+      System.out.println(Integer.parseInt(code.get(i).modPow(d,n).toString()));
+    }
 
-      @Override
-      public boolean remove(Object o) {
-        return false;
-      }
-
-      @Override
-      public boolean containsAll(Collection<?> c) {
-        return false;
-      }
-
-      @Override
-      public boolean addAll(Collection<? extends BigInteger> c) {
-        return false;
-      }
-
-      @Override
-      public boolean addAll(int index, Collection<? extends BigInteger> c) {
-        return false;
-      }
-
-      @Override
-      public boolean removeAll(Collection<?> c) {
-        return false;
-      }
-
-      @Override
-      public boolean retainAll(Collection<?> c) {
-        return false;
-      }
-
-      @Override
-      public void clear() {
-
-      }
-
-      @Override
-      public BigInteger get(int index) {
-        return null;
-      }
-
-      @Override
-      public BigInteger set(int index, BigInteger element) {
-        return null;
-      }
-
-      @Override
-      public void add(int index, BigInteger element) {
-
-      }
-
-      @Override
-      public BigInteger remove(int index) {
-        return null;
-      }
-
-      @Override
-      public int indexOf(Object o) {
-        return 0;
-      }
-
-      @Override
-      public int lastIndexOf(Object o) {
-        return 0;
-      }
-
-      @Override
-      public ListIterator<BigInteger> listIterator() {
-        return null;
-      }
-
-      @Override
-      public ListIterator<BigInteger> listIterator(int index) {
-        return null;
-      }
-
-      @Override
-      public List<BigInteger> subList(int fromIndex, int toIndex) {
-        return null;
-      }
-    };
-
+    for (int i = 0; i<code.size();i++){
+      decode += (char)Integer.parseInt(code.get(i).modPow(d,n).toString());
+    }
+    output.setText(decode);
   }
 }
